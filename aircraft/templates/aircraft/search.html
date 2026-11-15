@@ -1,0 +1,522 @@
+{% load static %}<!doctype html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HangarCo | Aviación Civil de Colombia</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        night: '#06121d',
+                        deep: '#0c2236',
+                        tech: '#19b5d8',
+                        skyblue: '#9fe3f2',
+                        aero: '#ffc83d',
+                        flag: '#e4414d',
+                        success: '#2fd6a1'
+                    },
+                    fontFamily: {
+                        sans: ['Figtree', 'system-ui', 'sans-serif'],
+                        display: ['"Bricolage Grotesque"', 'Figtree', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { background: #06121d; }
+        :focus-visible { outline: 2px solid #ffc83d; outline-offset: 3px; border-radius: 6px; }
+        [id] { scroll-margin-top: 6rem; }
+
+        /* Fondo del hero: luces suaves, sin depender de fotos externas */
+        .hero-bg {
+            background:
+                radial-gradient(60rem 36rem at 85% -10%, rgba(25, 181, 216, .22), transparent 60%),
+                radial-gradient(42rem 28rem at 0% 100%, rgba(255, 200, 61, .10), transparent 60%),
+                #06121d;
+        }
+
+        /* Navbar */
+        #navbar { background: rgba(6, 18, 29, .35); backdrop-filter: blur(14px); transition: background .3s, padding .3s, box-shadow .3s; }
+        #navbar.is-scrolled { background: rgba(6, 18, 29, .92); box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .7); }
+
+        /* Animación del avión: entra volando desde la izquierda y luego sigue en vuelo suave */
+        @keyframes flyin {
+            from { transform: translate(-380px, 90px) rotate(-6deg); opacity: 0; }
+            60%  { opacity: 1; }
+            to   { transform: translate(0, 0) rotate(0); opacity: 1; }
+        }
+        @keyframes cruise {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            50%  { transform: translate(-8px, -16px) rotate(-1.2deg); }
+            100% { transform: translate(6px, -4px) rotate(.8deg); }
+        }
+        .plane-float {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation:
+                flyin 2.6s cubic-bezier(.16, .8, .24, 1) both,
+                cruise 6s ease-in-out 2.6s infinite alternate;
+        }
+
+        /* Estelas que se alargan y se acortan */
+        @keyframes trail {
+            from { transform: scaleX(.55); opacity: .5; }
+            to   { transform: scaleX(1);   opacity: 1; }
+        }
+        .trail {
+            transform-box: fill-box;
+            transform-origin: right center;
+            animation: trail 3.2s ease-in-out 1.2s infinite alternate both;
+        }
+
+        /* Nubes que pasan, para dar sensación de velocidad */
+        @keyframes cloud-pass {
+            from { transform: translateX(90px); }
+            to   { transform: translateX(-120px); }
+        }
+        .cloud-a { animation: cloud-pass 16s linear infinite alternate; }
+        .cloud-b { animation: cloud-pass 11s linear infinite alternate-reverse; }
+
+        /* Entrada del hero (una sola vez, al cargar) */
+        @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .hero-in > * { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; }
+        .hero-in > *:nth-child(2) { animation-delay: .08s; }
+        .hero-in > *:nth-child(3) { animation-delay: .16s; }
+        .hero-in > *:nth-child(4) { animation-delay: .24s; }
+        .hero-in > *:nth-child(5) { animation-delay: .32s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .plane-float, .trail, .cloud-a, .cloud-b, .hero-in > * { animation: none; }
+        }
+    </style>
+</head>
+<body class="bg-night font-sans text-slate-100 antialiased selection:bg-aero selection:text-night">
+
+    <!-- Siluetas reutilizables (galería) -->
+    <svg width="0" height="0" class="absolute" aria-hidden="true">
+        <defs>
+            <symbol id="sil-airliner" viewBox="0 0 400 130">
+                <path d="M10 36 L60 48 L330 48 C372 48 396 58 399 67 C396 76 372 86 330 86 L80 86 C50 86 30 78 10 36 Z"/>
+                <path d="M18 42 L38 4 L66 4 L92 50 Z"/>
+                <path d="M50 64 L18 80 L36 80 L92 66 Z"/>
+                <path d="M215 70 L128 122 L160 122 L275 72 Z"/>
+                <rect x="170" y="96" width="52" height="20" rx="10"/>
+            </symbol>
+            <symbol id="sil-jet" viewBox="0 0 300 100">
+                <path d="M8 30 L40 44 L220 44 C262 44 290 52 294 58 C290 64 262 72 220 72 L60 72 C30 72 16 60 8 30 Z"/>
+                <path d="M14 34 L30 4 L52 4 L68 46 Z"/>
+                <rect x="2" y="0" width="58" height="7" rx="3.5"/>
+                <path d="M150 62 L100 98 L126 98 L198 64 Z"/>
+                <rect x="70" y="30" width="62" height="16" rx="8"/>
+            </symbol>
+            <symbol id="sil-heli" viewBox="0 0 300 130">
+                <ellipse cx="116" cy="76" rx="72" ry="34"/>
+                <path d="M180 68 L292 56 L292 68 L180 92 Z"/>
+                <path d="M278 36 L296 36 L296 76 L284 66 Z"/>
+                <rect x="111" y="30" width="10" height="18"/>
+                <rect x="6" y="24" width="220" height="6" rx="3"/>
+                <rect x="52" y="118" width="140" height="5" rx="2.5"/>
+                <rect x="84" y="104" width="5" height="16"/>
+                <rect x="152" y="104" width="5" height="16"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-white/10 px-6 py-4 md:px-14">
+        <a href="{% url 'search' %}" class="group flex items-center gap-3">
+            <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-tr from-tech via-indigo-500 to-aero p-0.5 shadow-lg shadow-tech/30 transition group-hover:scale-105">
+                <span class="grid h-full w-full place-items-center rounded-[14px] bg-deep text-aero">
+                    <i class="fa-solid fa-plane"></i>
+                </span>
+            </span>
+            <span class="leading-tight">
+                <span class="block font-display text-xl font-bold tracking-wide text-white">HANGAR<span class="text-aero">CO</span></span>
+                <span class="block text-[11px] text-tech">Colt Aviation Tech</span>
+            </span>
+        </a>
+
+        <div class="hidden items-center gap-9 text-sm font-medium text-slate-300 md:flex">
+            <a href="#buscador" class="transition hover:text-white">Consultar</a>
+            <a href="#flota-destacada" class="transition hover:text-white">Galería</a>
+            <a href="#info" class="transition hover:text-white">Características</a>
+            <a href="https://www.datos.gov.co" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 transition hover:text-white">Página oficial <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-aero"></i></a>
+        </div>
+
+        <a href="#buscador" class="rounded-full bg-aero px-5 py-2.5 text-sm font-bold text-night shadow-lg shadow-aero/20 transition hover:brightness-110">
+            <i class="fa-solid fa-magnifying-glass mr-1.5"></i>Buscar aeronave
+        </a>
+    </nav>
+
+    <!-- HERO: título + buscador + imagen -->
+    <header id="buscador" class="hero-bg relative isolate overflow-hidden px-6 pb-20 pt-32 md:px-14 lg:pb-28 lg:pt-40">
+        <div class="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-12">
+
+            <!-- Texto + búsqueda -->
+            <div class="hero-in lg:col-span-7">
+                <div class="inline-flex items-center gap-2.5 rounded-full border border-tech/30 bg-deep/80 px-4 py-2 text-sm text-skyblue">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-success"></span>
+                    </span>
+                    Datos abiertos del registro aeronáutico de Colombia
+                </div>
+
+                <h1 class="mt-7 font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-white sm:text-6xl xl:text-7xl">
+                    El cielo colombiano,<br>
+                    <span class="text-skyblue">a un clic de distancia</span>
+                </h1>
+
+                <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
+                    Consulta la matrícula, el fabricante y el modelo de las aeronaves civiles registradas en Colombia.
+                </p>
+
+                <!-- Formulario (GET y name="q" intactos) -->
+                <form id="searchForm" method="get" action="#resultados" class="mt-9 max-w-2xl">
+                    <div class="flex flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.06] p-2 backdrop-blur transition focus-within:border-tech focus-within:ring-4 focus-within:ring-tech/20 sm:flex-row">
+                        <label for="searchInput" class="sr-only">Matrícula, fabricante o modelo</label>
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-tech"></i>
+                            <input id="searchInput" type="text" name="q" value="{{ query }}" autocomplete="off"
+                                   placeholder="Ej. HK-4300, Cessna, Airbus, Piper…"
+                                   class="w-full rounded-xl bg-transparent py-4 pl-12 pr-4 text-base text-white placeholder-slate-500 focus:outline-none">
+                        </div>
+                        <button id="searchBtn" type="submit"
+                                class="flex cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-aero px-8 py-4 text-base font-bold text-night transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70">
+                            <span>Consultar</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-5 flex max-w-2xl flex-wrap items-center gap-2 text-sm">
+                    <span class="mr-1 text-slate-400">Prueba con</span>
+                    <a href="?q=Cessna#resultados" class="rounded-full border border-white/15 px-3.5 py-1.5 text-slate-200 transition hover:border-aero hover:bg-aero hover:text-night">Cessna</a>
+                    <a href="?q=Airbus#resultados" class="rounded-full border border-white/15 px-3.5 py-1.5 text-slate-200 transition hover:border-aero hover:bg-aero hover:text-night">Airbus</a>
+                    <a href="?q=Boeing#resultados" class="rounded-full border border-white/15 px-3.5 py-1.5 text-slate-200 transition hover:border-aero hover:bg-aero hover:text-night">Boeing</a>
+                    <a href="?q=Beechcraft#resultados" class="rounded-full border border-white/15 px-3.5 py-1.5 text-slate-200 transition hover:border-aero hover:bg-aero hover:text-night">Beechcraft</a>
+                    <a href="?q=Bell#resultados" class="rounded-full border border-white/15 px-3.5 py-1.5 text-slate-200 transition hover:border-aero hover:bg-aero hover:text-night">Bell</a>
+                </div>
+
+                {% if message %}
+                <div id="resultados" role="status" class="mt-6 flex max-w-2xl items-center gap-3 rounded-2xl border border-aero/40 bg-aero/10 p-4 text-sm text-aero">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- IMAGEN DEL HERO -->
+            <div class="lg:col-span-5">
+                <div class="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl shadow-black/60 sm:aspect-[16/11] sm:max-w-none lg:aspect-[4/5]">
+
+                    <!-- Ilustración: avión con librea tricolor sobre los Andes -->
+                    <svg viewBox="0 0 640 760" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 h-full w-full" role="img"
+                         aria-label="Avión comercial con franjas amarilla, azul y roja volando sobre las montañas al amanecer">
+                        <defs>
+                            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#071a2c"/>
+                                <stop offset=".45" stop-color="#0d4a68"/>
+                                <stop offset=".72" stop-color="#2aa6b8"/>
+                                <stop offset=".9" stop-color="#ffc83d"/>
+                            </linearGradient>
+                            <radialGradient id="sunGlow">
+                                <stop offset="0" stop-color="#ffd978" stop-opacity=".65"/>
+                                <stop offset="1" stop-color="#ffd978" stop-opacity="0"/>
+                            </radialGradient>
+                            <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#ffffff"/>
+                                <stop offset="1" stop-color="#cfe3ee"/>
+                            </linearGradient>
+                            <linearGradient id="trail" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+                                <stop offset="1" stop-color="#fff" stop-opacity=".75"/>
+                            </linearGradient>
+                            <clipPath id="hullClip">
+                                <path d="M10 36 L60 48 L330 48 C372 48 396 58 399 67 C396 76 372 86 330 86 L80 86 C50 86 30 78 10 36 Z"/>
+                            </clipPath>
+                        </defs>
+
+                        <rect width="640" height="760" fill="url(#sky)"/>
+
+                        <!-- estrellas -->
+                        <g fill="#fff" opacity=".75">
+                            <circle cx="70" cy="60" r="1.6"/><circle cx="190" cy="110" r="1.2"/><circle cx="310" cy="48" r="1.8"/>
+                            <circle cx="430" cy="96" r="1.3"/><circle cx="560" cy="62" r="1.7"/><circle cx="600" cy="170" r="1.2"/>
+                            <circle cx="120" cy="190" r="1.1"/><circle cx="500" cy="40" r="1.1"/>
+                        </g>
+
+                        <!-- sol -->
+                        <circle cx="430" cy="520" r="190" fill="url(#sunGlow)"/>
+                        <circle cx="430" cy="520" r="72" fill="#ffd978"/>
+
+                        <!-- nubes -->
+                        <g fill="#fff" opacity=".13" class="cloud-a">
+                            <rect x="30" y="300" width="230" height="14" rx="7"/>
+                            <rect x="110" y="322" width="160" height="10" rx="5"/>
+                        </g>
+                        <g fill="#fff" opacity=".13" class="cloud-b">
+                            <rect x="420" y="410" width="200" height="12" rx="6"/>
+                            <rect x="470" y="430" width="120" height="9" rx="4.5"/>
+                        </g>
+
+                        <!-- montañas -->
+                        <path d="M0 520 L80 450 L140 490 L230 400 L320 500 L400 440 L490 520 L570 430 L640 490 L640 760 L0 760Z" fill="#1d6a82"/>
+                        <path d="M0 600 L100 520 L180 580 L280 500 L380 590 L470 530 L560 600 L640 540 L640 760 L0 760Z" fill="#124560"/>
+                        <path d="M0 690 L90 630 L170 680 L270 620 L370 690 L470 635 L560 690 L640 650 L640 760 L0 760Z" fill="#0a2a40"/>
+
+                        <!-- avión -->
+                        <g transform="translate(70 215) rotate(-8) scale(1.22)">
+                            <g class="plane-float">
+                                <!-- estelas -->
+                                <rect class="trail" x="-420" y="62" width="430" height="3" fill="url(#trail)"/>
+                                <rect class="trail" x="-250" y="104" width="420" height="2.5" fill="url(#trail)"/>
+
+                                <!-- cola y estabilizador -->
+                                <path d="M18 42 L38 4 L66 4 L92 50 Z" fill="#123f8c"/>
+                                <path d="M50 64 L18 80 L36 80 L92 66 Z" fill="#0f3377"/>
+
+                                <!-- fuselaje -->
+                                <path d="M10 36 L60 48 L330 48 C372 48 396 58 399 67 C396 76 372 86 330 86 L80 86 C50 86 30 78 10 36 Z" fill="url(#hull)"/>
+
+                                <!-- librea tricolor -->
+                                <g clip-path="url(#hullClip)">
+                                    <rect x="0" y="74" width="420" height="6" fill="#ffc83d"/>
+                                    <rect x="0" y="80" width="420" height="3" fill="#1c4fa0"/>
+                                    <rect x="0" y="83" width="420" height="4" fill="#e4414d"/>
+                                </g>
+
+                                <!-- ventanas y cabina -->
+                                <g fill="#5b86a0">
+                                    <circle cx="112" cy="58" r="2.4"/><circle cx="128" cy="58" r="2.4"/><circle cx="144" cy="58" r="2.4"/>
+                                    <circle cx="160" cy="58" r="2.4"/><circle cx="176" cy="58" r="2.4"/><circle cx="192" cy="58" r="2.4"/>
+                                    <circle cx="208" cy="58" r="2.4"/><circle cx="224" cy="58" r="2.4"/><circle cx="240" cy="58" r="2.4"/>
+                                    <circle cx="256" cy="58" r="2.4"/><circle cx="272" cy="58" r="2.4"/><circle cx="288" cy="58" r="2.4"/>
+                                    <circle cx="304" cy="58" r="2.4"/>
+                                </g>
+                                <path d="M350 55 L370 55 L380 62 L352 62 Z" fill="#1b3a52"/>
+
+                                <!-- matrícula -->
+                                <text x="104" y="70" font-family="IBM Plex Mono, monospace" font-size="9" font-weight="600" fill="#123f8c">HK-4300</text>
+
+                                <!-- ala y motor -->
+                                <path d="M215 70 L128 122 L160 122 L275 72 Z" fill="#b6d0de"/>
+                                <rect x="170" y="94" width="52" height="21" rx="10.5" fill="#dbe9f1"/>
+                                <ellipse cx="217" cy="104.5" rx="4" ry="8.5" fill="#4e7088"/>
+                            </g>
+                        </g>
+                    </svg>
+
+                    <!--
+                        ¿Prefieres una FOTO real? Guarda una imagen en
+                        aircraft/static/aircraft/img/hero.jpg y quita este comentario:
+
+                        <img src="{% static 'aircraft/img/hero.jpg' %}" alt="Aeronave en vuelo sobre Colombia"
+                             class="absolute inset-0 h-full w-full object-cover">
+                    -->
+
+                    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night/80 to-transparent"></div>
+
+                    <!-- Ejemplo de registro -->
+                    <div class="absolute inset-x-5 bottom-5 rounded-2xl border border-white/15 bg-night/70 p-4 backdrop-blur-md">
+                        <p class="text-xs text-slate-400">Ejemplo de registro</p>
+                        <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+                            <span class="rounded-md bg-aero px-2.5 py-1 font-mono text-sm font-semibold text-night">HK-4300</span>
+                            <span class="text-sm font-medium text-white">Cessna 172</span>
+                            <span class="ml-auto inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+                                <span class="h-1.5 w-1.5 rounded-full bg-success"></span>Vigente
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Resultados -->
+    {% if rows %}
+    <section id="resultados" class="border-t border-white/5 bg-night px-4 py-16 sm:px-8 lg:px-14">
+        <div class="mx-auto max-w-6xl space-y-6">
+            <div class="flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-white sm:text-3xl">
+                        <i class="fa-solid fa-plane-circle-check mr-2 text-success"></i>Resultados para «{{ query }}»
+                    </h2>
+                    <p class="mt-1 text-sm text-slate-400">Registros oficiales, sin información personal de propietarios.</p>
+                </div>
+                <span class="inline-flex w-fit items-center gap-2 rounded-full border border-success/30 bg-success/15 px-4 py-2 text-sm font-semibold text-success">
+                    <span class="h-2 w-2 rounded-full bg-success"></span>
+                    {{ rows|length }} registros encontrados
+                </span>
+            </div>
+
+            <div class="overflow-x-auto rounded-3xl border border-white/10 bg-deep/70 shadow-2xl">
+                <table class="w-full border-collapse text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 bg-night/80 text-slate-400">
+                            {% for c in columns %}
+                            <th scope="col" class="whitespace-nowrap px-6 py-4 font-semibold">{{ c }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for row in rows %}
+                        <tr class="transition odd:bg-white/[0.02] hover:bg-tech/10">
+                            {% for cell in row %}
+                                {% if forloop.first %}
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <span class="inline-block rounded-md bg-aero px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-night">{{ cell }}</span>
+                                </td>
+                                {% elif forloop.last %}
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold {% if cell == 'VIGENTE' %}border border-success/40 bg-success/15 text-success{% else %}border border-slate-500/40 bg-slate-500/20 text-slate-300{% endif %}">
+                                        <span class="h-1.5 w-1.5 rounded-full {% if cell == 'VIGENTE' %}bg-success{% else %}bg-slate-400{% endif %}"></span>
+                                        {{ cell }}
+                                    </span>
+                                </td>
+                                {% else %}
+                                <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-200">{{ cell }}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Galería -->
+    <section id="flota-destacada" class="border-t border-white/5 bg-gradient-to-b from-night via-[#081728] to-night px-4 py-24 sm:px-8 lg:px-14">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-12 max-w-2xl">
+                <h2 class="font-display text-3xl font-bold text-white sm:text-5xl">Galería aeronáutica de Colombia</h2>
+                <p class="mt-4 text-lg text-slate-400">La diversidad de aeronaves registradas bajo los cielos colombianos.</p>
+            </div>
+
+            <div class="grid auto-rows-[15rem] gap-5 md:grid-cols-3">
+                <!-- Comercial (grande) -->
+                <article class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0f4a68] via-deep to-night md:col-span-2 md:row-span-2">
+                    <div class="absolute -right-10 top-10 w-[110%] text-skyblue/25 transition duration-700 group-hover:-translate-x-4">
+                        <svg viewBox="0 0 400 130" fill="currentColor" class="h-auto w-full"><use href="#sil-airliner"/></svg>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night via-night/80 to-transparent p-8 pt-24">
+                        <span class="rounded-full bg-aero px-3 py-1 text-xs font-bold text-night">Comercial</span>
+                        <h3 class="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">Transporte de pasajeros</h3>
+                        <p class="mt-2 max-w-lg text-slate-300">Aeronaves de gran escala que conectan las regiones del país con rutas nacionales e internacionales.</p>
+                    </div>
+                </article>
+
+                <!-- Jets -->
+                <article class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#12335c] via-deep to-night">
+                    <div class="absolute -right-6 top-5 w-4/5 text-tech/40 transition duration-700 group-hover:-translate-x-3">
+                        <svg viewBox="0 0 300 100" fill="currentColor" class="h-auto w-full"><use href="#sil-jet"/></svg>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night via-night/70 to-transparent p-6 pt-14">
+                        <span class="rounded-full bg-tech px-3 py-1 text-xs font-bold text-night">Jets ejecutivos</span>
+                        <h3 class="mt-2 font-display text-xl font-bold text-white">Aviación de negocios</h3>
+                        <p class="mt-1 text-sm text-slate-300">Conexión ejecutiva entre SKBO, SKRG y SKCL.</p>
+                    </div>
+                </article>
+
+                <!-- Helicópteros -->
+                <article class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0e4a46] via-deep to-night">
+                    <div class="absolute -right-4 top-4 w-3/4 text-success/35 transition duration-700 group-hover:-translate-x-3">
+                        <svg viewBox="0 0 300 130" fill="currentColor" class="h-auto w-full"><use href="#sil-heli"/></svg>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night via-night/70 to-transparent p-6 pt-14">
+                        <span class="rounded-full bg-success px-3 py-1 text-xs font-bold text-night">Ala rotativa</span>
+                        <h3 class="mt-2 font-display text-xl font-bold text-white">Helicópteros y utilitarios</h3>
+                        <p class="mt-1 text-sm text-slate-300">Ambulancia aérea, operaciones especiales y transporte urbano.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características -->
+    <section id="info" class="border-t border-white/5 bg-night px-4 py-24 sm:px-8 lg:px-14">
+        <div class="mx-auto grid max-w-6xl gap-12 lg:grid-cols-12">
+            <div class="lg:col-span-4">
+                <h2 class="font-display text-3xl font-bold text-white sm:text-4xl lg:sticky lg:top-28">Potencia y transparencia</h2>
+                <p class="mt-4 text-lg text-slate-400 lg:sticky lg:top-52">Tecnología moderna respaldada por datos abiertos oficiales.</p>
+            </div>
+
+            <div class="divide-y divide-white/10 border-y border-white/10 lg:col-span-8">
+                <div class="flex gap-6 py-8">
+                    <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-tech/40 bg-tech/15 text-2xl text-tech"><i class="fa-solid fa-database"></i></span>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white">Información centralizada</h3>
+                        <p class="mt-2 max-w-xl text-slate-400">Datos unificados de matrículas, fabricantes y estados de aeronaves en el territorio nacional.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6 py-8">
+                    <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-aero/40 bg-aero/15 text-2xl text-aero"><i class="fa-solid fa-bolt"></i></span>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white">Consulta sencilla</h3>
+                        <p class="mt-2 max-w-xl text-slate-400">Escribe una matrícula, un fabricante o un modelo y obtén resultados claros en cualquier dispositivo.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6 py-8">
+                    <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-success/40 bg-success/15 text-2xl text-success"><i class="fa-solid fa-cloud-arrow-down"></i></span>
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white">Datos abiertos</h3>
+                        <p class="mt-2 max-w-xl text-slate-400">Conexión directa con <a href="https://www.datos.gov.co" target="_blank" rel="noopener" class="text-skyblue underline-offset-4 hover:underline">datos.gov.co</a> (dataset qsim-wdzj).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-[#040b13] px-6 py-12 text-sm text-slate-400 md:px-14">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-8 md:flex-row">
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl border border-tech/40 bg-tech/20 text-aero"><i class="fa-solid fa-plane"></i></span>
+                <div>
+                    <span class="font-display text-lg font-bold tracking-wide text-white">HANGAR<span class="text-aero">CO</span></span>
+                    <p class="text-xs text-slate-500">Inteligencia y registro aeronáutico</p>
+                </div>
+            </div>
+
+            <div class="space-y-1.5 text-center text-xs md:text-right">
+                <p>
+                    Fuente oficial:
+                    <a href="https://www.datos.gov.co" target="_blank" rel="noopener" class="font-medium text-skyblue hover:underline">Portal de Datos Abiertos de Colombia (datos.gov.co)</a>
+                </p>
+                <p class="font-mono text-slate-500">Dataset qsim-wdzj · © 2026 HangarCo</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar: se oscurece al hacer scroll
+        const navbar = document.getElementById('navbar');
+        const onScroll = () => navbar.classList.toggle('is-scrolled', window.scrollY > 40);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // Botón: feedback mientras se consulta la fuente de datos
+        document.getElementById('searchForm').addEventListener('submit', () => {
+            const btn = document.getElementById('searchBtn');
+            btn.disabled = true;
+            btn.querySelector('span').textContent = 'Consultando…';
+            btn.querySelector('i').className = 'fa-solid fa-circle-notch fa-spin';
+        });
+    </script>
+</body>
+</html>
